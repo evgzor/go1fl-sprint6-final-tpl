@@ -12,14 +12,11 @@ import (
 )
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
-	// получаем имя файла из URL
-
 	curDir, err := os.Getwd()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
-
-	fmt.Println(curDir)
 
 	path := r.URL.Path
 	fmt.Println(path)
@@ -27,6 +24,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 		data, err := os.ReadFile(filepath.Dir(curDir) + "/index.html")
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -36,7 +34,6 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-
 	file, handler, err := r.FormFile("myFile")
 	if err != nil {
 		fmt.Print(err.Error())
@@ -58,15 +55,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	filename := time.Now().UTC().String() + ext
 
-	// создаём файл с таким же именем
 	dst, err := os.Create(filename)
 	if err != nil {
 		http.Error(w, "ошибка при создании файла", http.StatusInternalServerError)
 		return
 	}
+
 	defer dst.Close()
 
-	// копируем содержимое загруженного файла в новый файл
 	_, err = io.WriteString(dst, result)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
