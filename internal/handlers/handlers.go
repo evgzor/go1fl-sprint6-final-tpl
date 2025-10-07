@@ -12,25 +12,27 @@ import (
 )
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
 	curDir, err := os.Getwd()
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	path := r.URL.Path
-	fmt.Println(path)
-	if path == "/" {
-		data, err := os.ReadFile(filepath.Dir(curDir) + "/index.html")
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		w.Write(data)
+	filePath := filepath.Join(curDir, "index.html")
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
