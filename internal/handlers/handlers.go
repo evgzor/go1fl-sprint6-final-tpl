@@ -48,7 +48,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := io.ReadAll(file)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	result := service.Convert(string(data))
